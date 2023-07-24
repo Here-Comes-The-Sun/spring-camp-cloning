@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+</head>
+<body class="container">
+  <form onsubmit="getVemsData(event)" class="mt-3">
+    <div class="mb-3">
+      <label for="numOfRows" class="form-label">Number of Rows:</label>
+      <input type="number" id="numOfRows" name="numOfRows" value="10" min="1" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label for="gubun" class="form-label">Gubun (1 for exotic or 2 for domestic):</label>
+      <select id="gubun" name="gubun" class="form-select">
+        <option value="1">1</option>
+        <option value="2">2</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="certi_date" class="form-label">Certification Date (year):</label>
+      <input type="number" id="certi_date" name="certi_date" value="2015" min="1000" max="9999" class="form-control">
+    </div>
+
+    <input type="submit" value="Submit" class="btn btn-info">
+  </form>
+
+  <p id="data"></p>
+
+  <script>
+    function getVemsData(event) {
+      event.preventDefault();
+
+      var xhr = new XMLHttpRequest();
+      var url = 'http://apis.data.go.kr/1480523/Kencis/getVems';
+      var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'8cg1SHW8l4hZ5%2Fjfmcpf63ma0skfFS2qW3v5w4HaypN7zE9R0nlKr8UC69fWEwyfaLQIrz7os5ru00Pn2S%2FP5g%3D%3D';
+      queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1');
+      queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent(document.getElementById('numOfRows').value);
+      queryParams += '&' + encodeURIComponent('resultType') + '=' + encodeURIComponent('XML');
+      queryParams += '&' + encodeURIComponent('gubun') + '=' + encodeURIComponent(document.getElementById('gubun').value);
+      queryParams += '&' + encodeURIComponent('certi_date') + '=' + encodeURIComponent(document.getElementById('certi_date').value);
+
+      xhr.open('GET', url + queryParams);
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4) {
+          var guitarmessage=''
+          var response='';
+          if(this.status===200){
+            guitarmessage+='데이터 불러오기 성공\n'
+          }
+          else{
+            guitarmessage+='데이터 불러오기 실패\n'
+          }
+          
+          var rows = this.responseText.split('\n');
+          response +='<table class="table table-striped">';
+          response+='<th>차종</th><th>배출인증일</th><th>배출인증번호</th><th>사용연료</th><th>배출</th><th>소음</th><th>배출허용기준</th><th>소음허용기준</th><th>소음인증일</th><th>소음인증번호</th><th>업체명</th><th>차명</th><th>형식</th>'
+          for (var i = 8; i < rows.length; i++) {
+            if((i)%15===9){
+              response+='<tr>';
+            }
+            if(i%15===7||i%15===8){
+              
+              response += '';
+            }
+            else{
+              response +='<td>'+rows[i]+'</td>';
+            }
+            if((i)%15===8){
+              response+='</tr>';
+            }
+            
+            
+            
+
+          }
+          response +='</table>';
+          document.getElementById('data').innerHTML = guitarmessage+response;
+        }
+        
+      };
+
+      xhr.send('');
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+</body>
+</html>
